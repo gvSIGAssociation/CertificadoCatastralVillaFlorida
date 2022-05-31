@@ -10,7 +10,7 @@ from gvsig import currentView
 from gvsig import currentLayer
 
 from java.io import File
-
+from org.gvsig.fmap.mapcontext.layers.vectorial import FLyrVect
 from org.gvsig.app import ApplicationLocator
 from org.gvsig.andami import PluginsLocator
 from org.gvsig.scripting.app.extension import ScriptingExtension
@@ -20,6 +20,27 @@ from addons.CertificadoCatastralVillaFlorida.certificadoCatastralVillaFloridaPan
 
 class CertificadoCatastralVillaFloridaExtension(ScriptingExtension):
   def __init__(self):
+    self.attrNames = [
+      'CODIGO', 
+      'MAPA', 
+      'CUADRANTE', 
+      'MANZANA', 
+      'N_LOTE', 
+      'PROPIETARI', 
+      'TENENCIA', 
+      'AREA_DE_TE', 
+      #'FRENTE_s_m', 
+      'TIPO_DE_CA', 
+      'USO_DE_SUE', 
+      'MEJORAS_DE', 
+      'USO_CONSTR', 
+      #'CATEGORIAS', 
+      #'AREA_CONST', 
+      #'OBSERVECIO', 
+      'BARRIO', 
+      'UBICACION'#, 
+      #'IMAGEN'
+      ]
     pass
     
   def canQueryByAction(self):
@@ -31,20 +52,39 @@ class CertificadoCatastralVillaFloridaExtension(ScriptingExtension):
     return False
 
   def isLayerValid(self, layer):
+    if not isinstance(layer, FLyrVect):
+      return False
+    store = layer.getFeatureStore()
+    featureType = store.getDefaultFeatureTypeQuietly()
+    for attrName in self.attrNames:
+      if featureType.get(attrName) == None:
+        return False
     return True
     
   def isEnabled(self, action):
-    #if not self.isLayerValid(layer):
-    #  return False
-    if currentView()!=None:
-      return True
-    return False
+    view = currentView()
+    if view==None:
+      return False
+    mapContext = view.getMapContext()
+    activeLayers = mapContext.getLayers().getActives()
+    if len(activeLayers) != 1:
+      return False
+    layer = activeLayers[0]
+    if not self.isLayerValid(layer):
+        return False
+    store = layer.getFeatureStore()
+    selection = store.getSelection()
+    if selection.getSelectedCount() != 1:
+      return False
+    return True
 
   def execute(self,actionCommand, *args):
     actionCommand = actionCommand.lower()
-    if actionCommand == "settool-CertificadoCatastralVillaFlorida":
-      certificadoCatastralVillaFlorida = CertificadoCatastralVillaFloridaPanel()
+    print actionCommand
+    if actionCommand == "settool-certificadocatastralvillaflorida":
+      certificadoCatastralVillaFlorida = CertificadoCatastralVillaFloridaPanel(currentLayer())
       i18n = ToolsLocator.getI18nManager()
+      print "showTool"
       certificadoCatastralVillaFlorida.showTool(i18n.getTranslation("_Certificado_Catastral_Villa_Florida"))
       
 def selfRegisterI18n():
@@ -58,7 +98,7 @@ def selfRegister():
   actionManager = PluginsLocator.getActionInfoManager()
   iconTheme = ToolsSwingLocator.getIconThemeManager().getCurrent()
 
-  icon = File(gvsig.getResource(__file__,"images","CertificadoCatastral.png")).toURI().toURL()
+  icon = File(gvsig.getResource(__file__,"images","CertificadoCatastral_16x16.png")).toURI().toURL()
   iconTheme.registerDefault("scripting.CertificadoCatastralVillaFlorida", "action", "tools-CertificadoCatastralVillaFlorida", None, icon)
 
   CertificadoCatastralVillaFlorida_extension = CertificadoCatastralVillaFloridaExtension()
