@@ -50,6 +50,7 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
       geometry = feature.getDefaultGeometry()
       encuadre = geometry.buffer(2).getEnvelope()
       # Nos recorremos todos los elementos del mapa buscando los que hemos etiquetado
+      imageFrames = [None, None, None]
       for elemento in  context.getAllFFrames():
         if elemento.getTag() == "VISTA":
           # Ajustamos el encuadre de la vista al del elemento seleccionado
@@ -66,15 +67,22 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
           elemento.clearText() 
           elemento.addText(feature.getString(name))
 
-        elif elemento.getTag() == "IMAGEN0" and len(images) > 0:
+        elif elemento.getTag() == "IMAGEN0":
           elemento.setImage(images[0])
+          imageFrames[0] = elemento
     
-        elif elemento.getTag() == "IMAGEN1" and len(images) > 1:
+        elif elemento.getTag() == "IMAGEN1":
           elemento.setImage(images[1])
+          imageFrames[1] = elemento
     
-        elif elemento.getTag() == "IMAGEN2" and len(images) > 2:
+        elif elemento.getTag() == "IMAGEN2":
           elemento.setImage(images[2])
+          imageFrames[2] = elemento
       break
+    for n in range(0,3):
+      if images[n] == None:
+        context.delFFrame(imageFrames[n])
+    
     context.fullRefresh() 
     layout.getLayoutControl().getLayoutDraw().initialize()
 
