@@ -5,6 +5,7 @@ import os
 
 from gvsig.uselib import use_plugin
 use_plugin("org.gvsig.app.document.layout2.app.mainplugin")
+use_plugin("org.gvsig.pdf.app.mainplugin")
 
 from org.gvsig.tools import ToolsLocator
 from org.gvsig.pdf.swing.api import PDFSwingLocator, PDFViewer
@@ -105,11 +106,12 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
   def getImages(self):
     toolsSwingManager = ToolsSwingLocator.getToolsSwingManager()
     folder=self.pickerFolder.get()
-    if folder == None:
-      return list()
+    images = list()
+    if not folder:
+      # raturn a list with 3 None
+      return [None] * 3
     basePath = folder.getAbsolutePath()
     imagesPath = os.listdir(basePath)
-    images = list()
     for n in range(0,3):
       if len(imagesPath) <= n:
         images.append(None)
