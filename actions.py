@@ -16,31 +16,10 @@ from org.gvsig.andami import PluginsLocator
 from org.gvsig.scripting.app.extension import ScriptingExtension
 from org.gvsig.tools.swing.api import ToolsSwingLocator
 from org.gvsig.tools import ToolsLocator
-from addons.CertificadoCatastralVillaFlorida.certificadoCatastralVillaFloridaPanel import CertificadoCatastralVillaFloridaPanel
+from addons.CertificadoCatastralVillaFlorida.certificadoCatastralVillaFloridaPanel import CertificadoCatastralVillaFloridaPanel, isLayerValid
 
 class CertificadoCatastralVillaFloridaExtension(ScriptingExtension):
   def __init__(self):
-    self.attrNames = [
-      'CODIGO', 
-      'MAPA', 
-      'CUADRANTE', 
-      'MANZANA', 
-      'N_LOTE', 
-      'PROPIETARI', 
-      'TENENCIA', 
-      'AREA_DE_TE', 
-      #'FRENTE_s_m', 
-      'TIPO_DE_CA', 
-      'USO_DE_SUE', 
-      'MEJORAS_DE', 
-      'USO_CONSTR', 
-      #'CATEGORIAS', 
-      #'AREA_CONST', 
-      #'OBSERVECIO', 
-      'BARRIO', 
-      'UBICACION'#, 
-      #'IMAGEN'
-      ]
     pass
     
   def canQueryByAction(self):
@@ -51,26 +30,14 @@ class CertificadoCatastralVillaFloridaExtension(ScriptingExtension):
       return True
     return False
 
-  def isLayerValid(self, layer):
-    if not isinstance(layer, FLyrVect):
-      return False
-    store = layer.getFeatureStore()
-    featureType = store.getDefaultFeatureTypeQuietly()
-    for attrName in self.attrNames:
-      if featureType.get(attrName) == None:
-        return False
-    return True
-    
   def isEnabled(self, action):
     view = currentView()
     if view==None:
       return False
-    mapContext = view.getMapContext()
-    activeLayers = mapContext.getLayers().getActives()
-    if len(activeLayers) != 1:
+    layer = currentLayer()
+    if layer == None:
       return False
-    layer = activeLayers[0]
-    if not self.isLayerValid(layer):
+    if not isLayerValid(layer):
         return False
     store = layer.getFeatureStore()
     selection = store.getSelection()
@@ -82,7 +49,7 @@ class CertificadoCatastralVillaFloridaExtension(ScriptingExtension):
     actionCommand = actionCommand.lower()
     print actionCommand
     if actionCommand == "settool-certificadocatastralvillaflorida":
-      certificadoCatastralVillaFlorida = CertificadoCatastralVillaFloridaPanel(currentLayer())
+      certificadoCatastralVillaFlorida = CertificadoCatastralVillaFloridaPanel()
       i18n = ToolsLocator.getI18nManager()
       print "showTool"
       certificadoCatastralVillaFlorida.showTool(i18n.getTranslation("_Certificado_Catastral_Villa_Florida"))
