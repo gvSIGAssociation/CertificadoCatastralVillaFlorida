@@ -1,7 +1,8 @@
 #
-#Fri Jun 10 10:35:43 CEST 2022
+#Fri Jun 10 10:37:35 CEST 2022
 owner=
 code=CertificadoCatastralVillaFlorida
+download-url=https\://github.com/gvSIGAssociation/CertificadoCatastralVillaFlorida/releases/download/1.0.0-5/gvSIG-desktop-2.6.0-CertificadoCatastralVillaFlorida-1.0.0-5-testing-all-all-j1_7.gvspkg
 java-version=j1_7
 operating-system=all
 description=
