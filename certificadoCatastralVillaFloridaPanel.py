@@ -24,6 +24,8 @@ from org.gvsig.tools.dispose import DisposeUtils
 from java.awt.event import ComponentAdapter
 from org.gvsig.tools.util import ToolsUtilLocator
 from org.gvsig.fmap.mapcontext.layers.vectorial import FLyrVect
+from org.apache.commons.text import WordUtils
+
 
 from org.gvsig.scripting import ScriptingLocator
 
@@ -99,12 +101,15 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
     swingManager.translate(self.lblApplicant)
     swingManager.translate(self.lblImagesFolder)
     swingManager.translate(self.btnGenerateCertificate)
+    swingManager.translate(self.lblFecha)
+    swingManager.translate(self.lblHora)
+    swingManager.translate(self.lblObservaciones)
 
     config = readConfigFile()
     imagesFolder = config.get("imagesfolder",None)
     if imagesFolder != None:
       self.pickerFolder.set(File(imagesFolder))
-    ToolsSwingUtils.ensureRowsCols(self.asJComponent(), 7, 70, 10, 100)
+    ToolsSwingUtils.ensureRowsCols(self.asJComponent(), 9, 70, 12, 100)
 
 
   def btnGenerateCertificate_click(self, event):
@@ -120,7 +125,7 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
     if selection.getSelectedCount() != 1:
       msgbox(u"Debe seleccionar una y solo una geometría")
       return
-
+    observaciones = WordUtils.wrap(self.txtObservaciones.getText(), 80).split("\n")[:4]
     mapContext = None
     imageFrames = [None, None, None]
     viewFrame = None
@@ -143,11 +148,19 @@ class CertificadoCatastralVillaFloridaPanel(FormPanel):
             mapContext.getViewPort().setEnvelope(encuadre)
             mapContext.invalidate()
             viewFrame = elemento
-            
           elif elemento.getTag() == "SOLICITANTE":
             elemento.clearText() 
             elemento.addText(self.txtSolicitante.getText())
-      
+          elif elemento.getTag() == "FECHA":
+            elemento.clearText() 
+            elemento.addText(self.txtFecha.getText())
+          elif elemento.getTag() == "HORA":
+            elemento.clearText() 
+            elemento.addText(self.txtHora.getText())
+          elif elemento.getTag() == "OBSERVACIONES":
+            elemento.clearText() 
+            for line in observaciones:
+              elemento.addText(line)
           elif elemento.getTag() == "ATRIBUTO":
             name = elemento.getText().get(0)
             elemento.clearText() 
